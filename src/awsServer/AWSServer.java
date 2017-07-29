@@ -16,7 +16,7 @@ public class AWSServer {
 				serverSocket = new ServerSocket(mServerIP);
 				while(run) {
 					clientSocket = serverSocket.accept();
-					new ClientTask(clientSocket).run();
+					new ClientTask(clientSocket).start();
 				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
