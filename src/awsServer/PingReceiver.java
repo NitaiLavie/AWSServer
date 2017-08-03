@@ -1,7 +1,11 @@
 package awsServer;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.ServerSocket;
+import java.net.Socket;
 
 public class PingReceiver extends Thread {
 	
@@ -13,8 +17,15 @@ public class PingReceiver extends Thread {
 		
 		try {
 			ServerSocket serverSocket = new ServerSocket(6666);
+			Socket pingSocket = null;
+			BufferedWriter buf = null;
 			while(mRun) {
-				serverSocket.accept();
+				pingSocket = serverSocket.accept();
+				buf = new BufferedWriter(new BufferedWriter(new OutputStreamWriter(pingSocket.getOutputStream())));
+				buf.write("ACK\n");
+				buf.flush();
+				buf.close();
+				pingSocket.close();
 			}
 			serverSocket.close();
 		} catch (IOException e) {
