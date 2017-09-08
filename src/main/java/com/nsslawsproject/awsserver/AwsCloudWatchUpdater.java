@@ -17,10 +17,12 @@ import com.amazonaws.services.cloudwatch.model.StandardUnit;
 public class AwsCloudWatchUpdater extends Thread {
 	
 	private RunningAverageCalculator mRunningAverage;
+	private ReadWriteInt mInterval;
 	private boolean mRun;
 	
-	public AwsCloudWatchUpdater(RunningAverageCalculator runningAverage) {
+	public AwsCloudWatchUpdater(RunningAverageCalculator runningAverage, ReadWriteInt interval) {
 		mRunningAverage = runningAverage;
+		mInterval = interval;
 	}
 	
 	@Override
@@ -66,7 +68,7 @@ public class AwsCloudWatchUpdater extends Thread {
         			.withMetricData(datum);
         	PutMetricDataResult response = cw.putMetricData(request);
         	try {
-				Thread.sleep(30000);
+				Thread.sleep(mInterval.get());
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

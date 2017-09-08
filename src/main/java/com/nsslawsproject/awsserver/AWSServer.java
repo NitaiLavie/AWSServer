@@ -18,25 +18,32 @@ public class AWSServer {
 	public static void main(String [] args) {
 		boolean run = true;
 		AtomicInteger threadCounter = new AtomicInteger(0);
-		ConfigurationListener configurationListener = new ConfigurationListener();
-		configurationListener.start();
+		ReadWriteInt updateInterval = new ReadWriteInt(30000);
+		
 		PingReceiver pinger = new PingReceiver();
 		pinger.start();
+		
 		RunningAverageCalculator runningAverage = new RunningAverageCalculator(threadCounter);
 		runningAverage.start();
-		AwsCloudWatchUpdater updater = new AwsCloudWatchUpdater(runningAverage);
-		updater.start();
+		
+		AwsCloudWatchUpdater updater = new AwsCloudWatchUpdater(runningAverage, updateInterval);
+		boolean connected = false;
+		
 		ServerSocket serverSocket = null;
 		Socket clientSocket = null;
 			try {
 				serverSocket = new ServerSocket(mServerPort);
 				while(run) {
 					clientSocket = serverSocket.accept();
+					if(!connected) {
+						updater.start();
+						connected = true;
+					}
 					if(threadCounter.get() <= mTreadCountLimit) {
-						new ClientTask(clientSocket, new TanhAction(mActionItterations.get()) ,threadCounter).start();
+						new ClientTask(clientSocket, new StressAction() ,threadCounter, updateInterval).start();
 					}
 					else {
-						new ClientTask(clientSocket, threadCounter, true).start();
+						new ClientTask(clientSocket, threadCounter, updateInterval, true).start();
 					}
 				}
 			} catch (IOException e) {
@@ -47,7 +54,6 @@ public class AWSServer {
 				pinger.halt();
 				updater.halt();
 				runningAverage.halt();
-				configurationListener.halt();
 				try {
 					if(serverSocket!=null) {
 						serverSocket.close();
