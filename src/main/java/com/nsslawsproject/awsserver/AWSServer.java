@@ -9,11 +9,7 @@ public class AWSServer {
 	
 	private static final int mServerPort = 7777;
 	private static final int mTreadCountLimit = 100;
-	private static AtomicInteger mActionItterations = new AtomicInteger((int) 2e6);
-	
-	public static void setActionItterations(int itterations) {
-		mActionItterations.set(itterations);
-	}
+	public static final long ServerID = System.currentTimeMillis();
 	
 	public static void main(String [] args) {
 		boolean run = true;

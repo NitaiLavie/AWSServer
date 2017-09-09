@@ -55,7 +55,8 @@ public class AwsCloudWatchUpdater extends Thread {
         	MetricDatum datum = new MetricDatum()
         	    .withMetricName("AVG_THREAD_COUNT")
         	    .withUnit(StandardUnit.Count)
-        	    .withDimensions(dimension);
+        	    .withDimensions(dimension)
+        	    .withStorageResolution(1); //sets this datum to be High-Resolution!!!
         	
         	
 //        	PutMetricDataRequest request = new PutMetricDataRequest()

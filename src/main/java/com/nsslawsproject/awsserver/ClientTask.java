@@ -48,7 +48,7 @@ public class ClientTask extends Thread{
 		super.run();
 		if(!mReject) {
 			// the task is accepted!
-			mThreadCounter.incrementAndGet();
+			int threadCount = mThreadCounter.incrementAndGet();
 			BufferedWriter buffWrite = null;
 			BufferedReader buffRead = null;
 			
@@ -64,7 +64,7 @@ public class ClientTask extends Thread{
 			}
 			mAction.execute(mCores, mTimeout, mIterations);
 			try {
-				buffWrite.write("done\n");
+				buffWrite.write(AWSServer.ServerID+":"+threadCount+": done\n");
 				buffWrite.flush();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -89,7 +89,7 @@ public class ClientTask extends Thread{
 				e.printStackTrace();
 			}
 			try {
-				buff.write("rejected!\n");
+				buff.write(AWSServer.ServerID+": rejected!\n");
 				buff.flush();
 			} catch (IOException e) {
 				e.printStackTrace();

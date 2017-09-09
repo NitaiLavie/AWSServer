@@ -12,7 +12,7 @@ public class StressAction implements ServerAction {
 	public void SystemStress(int cores, int timeout) {
 		rt = java.lang.Runtime.getRuntime();
 		try {
-			Process p = rt.exec("stress -c "+cores+" -t "+timeout+"\n");
+			Process p = rt.exec("sudo nice -39 stress -c "+cores+" -t "+timeout+"\n");
 			p.waitFor();
 		} catch (IOException | InterruptedException e) {
 			// TODO Auto-generated catch block
