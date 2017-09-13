@@ -29,8 +29,6 @@ public class StressAction implements ServerAction {
 	public void execute(int cores, int timeout, int iterations) {
 		for(int i=0; i<iterations; i++) {
 			SystemStress(cores, timeout);
-			//double a = Math.sqrt(Math.tanh(Math.sqrt(Math.PI)));
-			//System.out.println(a);
 		}
 	}
 

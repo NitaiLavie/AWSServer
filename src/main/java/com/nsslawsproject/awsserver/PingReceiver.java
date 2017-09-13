@@ -8,6 +8,10 @@ import java.net.Socket;
 
 public class PingReceiver extends Thread {
 	
+	public PingReceiver() {
+		this.setPriority(Thread.MAX_PRIORITY);
+	}
+	
 	private boolean mRun = true;
 	
 	@Override

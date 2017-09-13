@@ -35,8 +35,8 @@ public class AWSServer {
 						updater.start();
 						connected = true;
 					}
-					if(threadCounter.get() <= mTreadCountLimit) {
-						new ClientTask(clientSocket, new StressAction() ,threadCounter, updateInterval).start();
+					if(threadCounter.get() < mTreadCountLimit) {
+						new ClientTask(clientSocket, new TanhAction() ,threadCounter, updateInterval).start();
 					}
 					else {
 						new ClientTask(clientSocket, threadCounter, updateInterval, true).start();

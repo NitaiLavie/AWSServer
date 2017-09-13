@@ -15,6 +15,7 @@ public class RunningAverageCalculator extends Thread {
 	private final Lock mAverageLock;
 	
 	public RunningAverageCalculator(AtomicInteger threadCounter) {
+		this.setPriority(Thread.MAX_PRIORITY);
 		mThreadCounter = threadCounter;
 		mRunningThreadsArray = new Integer[mArrayLength];
 		mAverageLock = new ReentrantLock();

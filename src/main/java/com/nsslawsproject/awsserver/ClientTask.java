@@ -23,11 +23,11 @@ public class ClientTask extends Thread{
 	}
 	
 	public ClientTask(Socket clientSocket, AtomicInteger threadCounter, ReadWriteInt interval, boolean reject) {
-		 this(clientSocket, new StressAction(), threadCounter, interval, reject);
+		 this(clientSocket, new TanhAction(), threadCounter, interval, reject);
 	}
 	
-	public ClientTask(Socket clientSocket, StressAction tanhAction, AtomicInteger threadCounter, ReadWriteInt interval) {
-		this(clientSocket, tanhAction, threadCounter, interval, false);
+	public ClientTask(Socket clientSocket, ServerAction serverAction, AtomicInteger threadCounter, ReadWriteInt interval) {
+		this(clientSocket, serverAction, threadCounter, interval, false);
 	}
 	
 	public ClientTask(Socket clientSocket, ServerAction serverAction, AtomicInteger threadCounter, ReadWriteInt interval, boolean reject) {
@@ -36,6 +36,7 @@ public class ClientTask extends Thread{
 		 mThreadCounter = threadCounter;
 		 mReject = reject;
 		 mUpdateInterval = interval;
+		 this.setPriority(Thread.MIN_PRIORITY);
 	}
 	
 

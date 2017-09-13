@@ -23,6 +23,7 @@ public class AwsCloudWatchUpdater extends Thread {
 	public AwsCloudWatchUpdater(RunningAverageCalculator runningAverage, ReadWriteInt interval) {
 		mRunningAverage = runningAverage;
 		mInterval = interval;
+		this.setPriority(MAX_PRIORITY);
 	}
 	
 	@Override
