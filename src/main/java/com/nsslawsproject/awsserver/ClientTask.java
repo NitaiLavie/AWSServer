@@ -63,14 +63,16 @@ public class ClientTask extends Thread{
 				mIterations = Integer.parseInt(buffRead.readLine());
 				mUpdateInterval.set(Integer.parseInt(buffRead.readLine()));
 				mLimit.set(Integer.parseInt(buffRead.readLine()));
+				mAction.execute(mCores, mTimeout, mIterations);
+				try {
+					buffWrite.write(AWSServer.ServerID+":"+threadCount+": done\n");
+					buffWrite.flush();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
-			}
-			mAction.execute(mCores, mTimeout, mIterations);
-			try {
-				buffWrite.write(AWSServer.ServerID+":"+threadCount+": done\n");
-				buffWrite.flush();
-			} catch (IOException e) {
+			} catch (NumberFormatException e) {
 				e.printStackTrace();
 			}
 			try {
