@@ -17,25 +17,27 @@ public class ClientTask extends Thread{
 	private int mTimeout;
 	private int mIterations;
 	private ReadWriteInt mUpdateInterval;
+	private ReadWriteInt mLimit;
 	
-	public ClientTask(Socket clientSocket, AtomicInteger threadCounter, ReadWriteInt interval) {
-		this(clientSocket, threadCounter, interval, false);
+	public ClientTask(Socket clientSocket, AtomicInteger threadCounter, ReadWriteInt interval, ReadWriteInt limit) {
+		this(clientSocket, threadCounter, interval, limit, false);
 	}
 	
-	public ClientTask(Socket clientSocket, AtomicInteger threadCounter, ReadWriteInt interval, boolean reject) {
-		 this(clientSocket, new TanhAction(), threadCounter, interval, reject);
+	public ClientTask(Socket clientSocket, AtomicInteger threadCounter, ReadWriteInt interval, ReadWriteInt limit, boolean reject) {
+		 this(clientSocket, new TanhAction(), threadCounter, interval, limit, reject);
 	}
 	
-	public ClientTask(Socket clientSocket, ServerAction serverAction, AtomicInteger threadCounter, ReadWriteInt interval) {
-		this(clientSocket, serverAction, threadCounter, interval, false);
+	public ClientTask(Socket clientSocket, ServerAction serverAction, AtomicInteger threadCounter, ReadWriteInt interval, ReadWriteInt limit) {
+		this(clientSocket, serverAction, threadCounter, interval, limit, false);
 	}
 	
-	public ClientTask(Socket clientSocket, ServerAction serverAction, AtomicInteger threadCounter, ReadWriteInt interval, boolean reject) {
+	public ClientTask(Socket clientSocket, ServerAction serverAction, AtomicInteger threadCounter, ReadWriteInt interval, ReadWriteInt limit, boolean reject) {
 		 mClientSocket = clientSocket;
 		 mAction = serverAction;
 		 mThreadCounter = threadCounter;
 		 mReject = reject;
 		 mUpdateInterval = interval;
+		 mLimit = limit;
 		 this.setPriority(Thread.MIN_PRIORITY);
 	}
 	
@@ -60,6 +62,7 @@ public class ClientTask extends Thread{
 				mTimeout = Integer.parseInt(buffRead.readLine());
 				mIterations = Integer.parseInt(buffRead.readLine());
 				mUpdateInterval.set(Integer.parseInt(buffRead.readLine()));
+				mLimit.set(Integer.parseInt(buffRead.readLine()));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

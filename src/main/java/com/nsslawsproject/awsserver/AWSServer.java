@@ -8,13 +8,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class AWSServer {
 	
 	private static final int mServerPort = 7777;
-	private static final int mTreadCountLimit = 100;
 	public static final long ServerID = System.currentTimeMillis();
 	
 	public static void main(String [] args) {
 		boolean run = true;
 		AtomicInteger threadCounter = new AtomicInteger(0);
 		ReadWriteInt updateInterval = new ReadWriteInt(30000);
+		ReadWriteInt threadCountLimit = new ReadWriteInt(100);
+		
 		
 		PingReceiver pinger = new PingReceiver();
 		pinger.start();
@@ -35,11 +36,11 @@ public class AWSServer {
 						updater.start();
 						connected = true;
 					}
-					if(threadCounter.get() < mTreadCountLimit) {
-						new ClientTask(clientSocket, new TanhAction() ,threadCounter, updateInterval).start();
+					if(threadCounter.get() < threadCountLimit.get()) {
+						new ClientTask(clientSocket, new TanhAction() ,threadCounter, updateInterval, threadCountLimit).start();
 					}
 					else {
-						new ClientTask(clientSocket, threadCounter, updateInterval, true).start();
+						new ClientTask(clientSocket, threadCounter, updateInterval, threadCountLimit, true).start();
 					}
 				}
 			} catch (IOException e) {
