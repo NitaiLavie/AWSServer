@@ -37,10 +37,10 @@ public class AWSServer {
 						connected = true;
 					}
 					if(threadCounter.get() < threadCountLimit.get()) {
-						new ClientTask(clientSocket, new TanhAction() ,threadCounter, updateInterval, threadCountLimit).start();
+						new ClientTask(clientSocket, new TanhAction() ,threadCounter, runningAverage, updateInterval, threadCountLimit).start();
 					}
 					else {
-						new ClientTask(clientSocket, threadCounter, updateInterval, threadCountLimit, true).start();
+						new ClientTask(clientSocket, threadCounter, runningAverage, updateInterval, threadCountLimit, true).start();
 					}
 				}
 			} catch (IOException e) {

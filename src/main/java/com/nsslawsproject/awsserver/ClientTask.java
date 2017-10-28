@@ -18,26 +18,28 @@ public class ClientTask extends Thread{
 	private int mIterations;
 	private ReadWriteInt mUpdateInterval;
 	private ReadWriteInt mLimit;
+	private RunningAverageCalculator mRunningAverage;
 	
-	public ClientTask(Socket clientSocket, AtomicInteger threadCounter, ReadWriteInt interval, ReadWriteInt limit) {
-		this(clientSocket, threadCounter, interval, limit, false);
+	public ClientTask(Socket clientSocket, AtomicInteger threadCounter, RunningAverageCalculator runningAverage, ReadWriteInt interval, ReadWriteInt limit) {
+		this(clientSocket, threadCounter, runningAverage, interval, limit, false);
 	}
 	
-	public ClientTask(Socket clientSocket, AtomicInteger threadCounter, ReadWriteInt interval, ReadWriteInt limit, boolean reject) {
-		 this(clientSocket, new TanhAction(), threadCounter, interval, limit, reject);
+	public ClientTask(Socket clientSocket, AtomicInteger threadCounter, RunningAverageCalculator runningAverage, ReadWriteInt interval, ReadWriteInt limit, boolean reject) {
+		 this(clientSocket, new TanhAction(), threadCounter, runningAverage, interval, limit, reject);
 	}
 	
-	public ClientTask(Socket clientSocket, ServerAction serverAction, AtomicInteger threadCounter, ReadWriteInt interval, ReadWriteInt limit) {
-		this(clientSocket, serverAction, threadCounter, interval, limit, false);
+	public ClientTask(Socket clientSocket, ServerAction serverAction, AtomicInteger threadCounter, RunningAverageCalculator runningAverage, ReadWriteInt interval, ReadWriteInt limit) {
+		this(clientSocket, serverAction, threadCounter, runningAverage, interval, limit, false);
 	}
 	
-	public ClientTask(Socket clientSocket, ServerAction serverAction, AtomicInteger threadCounter, ReadWriteInt interval, ReadWriteInt limit, boolean reject) {
+	public ClientTask(Socket clientSocket, ServerAction serverAction, AtomicInteger threadCounter, RunningAverageCalculator runningAverage, ReadWriteInt interval, ReadWriteInt limit, boolean reject) {
 		 mClientSocket = clientSocket;
 		 mAction = serverAction;
 		 mThreadCounter = threadCounter;
 		 mReject = reject;
 		 mUpdateInterval = interval;
 		 mLimit = limit;
+		 mRunningAverage = runningAverage;
 		 this.setPriority(Thread.MIN_PRIORITY);
 	}
 	
@@ -58,18 +60,16 @@ public class ClientTask extends Thread{
 			try {
 				buffWrite = new BufferedWriter(new OutputStreamWriter(mClientSocket.getOutputStream()));
 				buffRead = new BufferedReader(new InputStreamReader(mClientSocket.getInputStream()));
+				
 				mCores = Integer.parseInt(buffRead.readLine());
 				mTimeout = Integer.parseInt(buffRead.readLine());
 				mIterations = Integer.parseInt(buffRead.readLine());
 				mUpdateInterval.set(Integer.parseInt(buffRead.readLine()));
 				mLimit.set(Integer.parseInt(buffRead.readLine()));
 				mAction.execute(mCores, mTimeout, mIterations);
-				try {
-					buffWrite.write(AWSServer.ServerID+":"+threadCount+": done\n");
-					buffWrite.flush();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+				
+				buffWrite.write("done,"+AWSServer.ServerID+","+mRunningAverage.getRunningAverage()+"\n");
+				buffWrite.flush();
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (NumberFormatException e) {
@@ -95,7 +95,7 @@ public class ClientTask extends Thread{
 				e.printStackTrace();
 			}
 			try {
-				buff.write(AWSServer.ServerID+": rejected!\n");
+				buff.write("rejected,"+AWSServer.ServerID+","+mRunningAverage.getRunningAverage()+"\n");
 				buff.flush();
 			} catch (IOException e) {
 				e.printStackTrace();
