@@ -15,25 +15,30 @@ import com.amazonaws.services.cloudwatch.model.StandardUnit;
 
 
 public class AwsCloudWatchUpdater extends Thread {
+	// the aws cloudwatch updater is one of the backbone components of the server.
+	// it is responsible for sending the running thread count average metric to the
+	// aws cloud watch.
 	
-	private RunningAverageCalculator mRunningAverage;
-	private ReadWriteInt mInterval;
-	private boolean mRun;
+	private RunningAverageCalculator mRunningAverage; // the server's running average component
+	private ReadWriteInt mInterval; // the update interval - given by the client (for configurability)
+	private boolean mRun; // run the updater while mRun is true
 	
 	public AwsCloudWatchUpdater(RunningAverageCalculator runningAverage, ReadWriteInt interval) {
 		mRunningAverage = runningAverage;
 		mInterval = interval;
-		this.setPriority(MAX_PRIORITY);
+		this.setPriority(MAX_PRIORITY); // this thread gets top priority because it's important for the whole system stability
 	}
 	
 	@Override
 	public void run() {
 		super.run();
-		/*
-         * The ProfileCredentialsProvider will return your [default]
-         * credential profile by reading from the credentials file located at
-         * (~/.aws/credentials).
-         */
+//		this section is unneeded but was part of the example for custom metrics:
+//		=========================================================================
+//		/*
+//         * The ProfileCredentialsProvider will return your [default]
+//         * credential profile by reading from the credentials file located at
+//         * (~/.aws/credentials).
+//         */
 //        AWSCredentials credentials = null;
 //        try {
 //            credentials = new ProfileCredentialsProvider().getCredentials();
@@ -72,13 +77,13 @@ public class AwsCloudWatchUpdater extends Thread {
         	try {
 				Thread.sleep(mInterval.get());
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
         }
 	}
 	
 	public void halt() {
+		// stop the aws cloudwatch updater 
 		mRun = false;
 	}
 

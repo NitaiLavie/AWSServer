@@ -5,6 +5,11 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class RunningAverageCalculator extends Thread {
+	// the running average calculator is one of the backbone components of the server.
+	// it is responsible for calculating the running average of the thread counter.
+	// each second the thread counter is being sampled and the last 60 samples are
+	// being averaged.
+	
 	private Double mAverage = 0.0;
 	private AtomicInteger mThreadCounter;
 	private Integer[] mRunningThreadsArray;
@@ -53,7 +58,6 @@ public class RunningAverageCalculator extends Thread {
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

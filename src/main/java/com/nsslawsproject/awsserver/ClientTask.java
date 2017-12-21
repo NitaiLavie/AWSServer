@@ -9,14 +9,14 @@ import java.net.Socket;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ClientTask extends Thread{
-	private Socket mClientSocket;
-	private ServerAction mAction;
-	private AtomicInteger mThreadCounter;
-	private boolean mReject;
-	private int mCores;
-	private int mTimeout;
-	private int mIterations;
-	private ReadWriteInt mUpdateInterval;
+	private Socket mClientSocket; // the socket the client connect to - getting when constructed
+	private ServerAction mAction; // the action that is t be done - the "task"
+	private AtomicInteger mThreadCounter; // the server's thread counter - bring updated by all the client tasks
+	private boolean mReject; // when false - a regular client task, when true - a degenerated version the rejects the task
+	private int mCores; // number of cores to stress on - received from the client
+	private int mTimeout; // stress timeout - received from the client
+	private int mIterations; // the number of iteration to run - received from the client
+	private ReadWriteInt mUpdateInterval; // the update interval to send metrics to aws cloud - received from the client
 	private ReadWriteInt mLimit;
 	private RunningAverageCalculator mRunningAverage;
 	
@@ -40,11 +40,12 @@ public class ClientTask extends Thread{
 		 mUpdateInterval = interval;
 		 mLimit = limit;
 		 mRunningAverage = runningAverage;
-		 this.setPriority(Thread.MIN_PRIORITY);
+		 this.setPriority(Thread.MIN_PRIORITY); // client task thread are set to the lowest priority since they are the less important that server backbone threads
 	}
 	
 
 	public void setAction(ServerAction serverAction) {
+		// setting the type of task to run
 		mAction = serverAction;
 	}
 
@@ -53,7 +54,7 @@ public class ClientTask extends Thread{
 		super.run();
 		if(!mReject) {
 			// the task is accepted!
-			int threadCount = mThreadCounter.incrementAndGet();
+			int threadCount = mThreadCounter.incrementAndGet(); // a new thread has started - increase thread count
 			BufferedWriter buffWrite = null;
 			BufferedReader buffRead = null;
 			
@@ -61,13 +62,17 @@ public class ClientTask extends Thread{
 				buffWrite = new BufferedWriter(new OutputStreamWriter(mClientSocket.getOutputStream()));
 				buffRead = new BufferedReader(new InputStreamReader(mClientSocket.getInputStream()));
 				
+				// getting parameters from the client - this is to let us to configure the server from the client side
 				mCores = Integer.parseInt(buffRead.readLine());
 				mTimeout = Integer.parseInt(buffRead.readLine());
 				mIterations = Integer.parseInt(buffRead.readLine());
 				mUpdateInterval.set(Integer.parseInt(buffRead.readLine()));
 				mLimit.set(Integer.parseInt(buffRead.readLine()));
+				
+				// run the client task
 				mAction.execute(mCores, mTimeout, mIterations);
 				
+				// sending a response back to the client with important information
 				buffWrite.write("done,"+AWSServer.ServerID+","+mRunningAverage.getRunningAverage()+"\n");
 				buffWrite.flush();
 			} catch (IOException e) {
@@ -95,6 +100,7 @@ public class ClientTask extends Thread{
 				e.printStackTrace();
 			}
 			try {
+				// sending a response back to the client with important information + rejection
 				buff.write("rejected,"+AWSServer.ServerID+","+mRunningAverage.getRunningAverage()+"\n");
 				buff.flush();
 			} catch (IOException e) {
